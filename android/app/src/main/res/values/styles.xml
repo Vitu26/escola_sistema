@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Tema padrão da aplicação -->
+    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Personalize seu tema principal -->
+    </style>
+
+    <!-- Definição do tema para FullscreenActivity -->
+    <style name="FullscreenTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Personalize este tema conforme necessário -->
+        <item name="android:windowFullscreen">true</item>
+    </style>
+</resources>
+
