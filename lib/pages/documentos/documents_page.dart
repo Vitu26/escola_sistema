@@ -2,6 +2,7 @@
 import 'dart:convert';
 import 'package:app/utils/cache_manager.dart';
 import 'package:app/utils/download_interface.dart';
+import 'package:app/widgets/custom_app_bar.dart';
 import 'package:flutter/foundation.dart'
     show kIsWeb; // Importa kIsWeb para detectar a plataforma
 import 'package:flutter/material.dart';
@@ -52,11 +53,11 @@ class _DocumentsPageState extends State<DocumentsPage> {
     });
 
     final cacheData = await cacheManager.getFromCache(cacheKey);
-    if(cacheData != null) {
+    if (cacheData != null) {
       setState(() {
         documents = (jsonDecode(cacheData) as List)
-        .map((documentsJson) => Documents.fromJson(documentsJson))
-        .toList();
+            .map((documentsJson) => Documents.fromJson(documentsJson))
+            .toList();
       });
     }
 
@@ -96,65 +97,100 @@ class _DocumentsPageState extends State<DocumentsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Documentos'),
-        centerTitle: true,
-      ),
-      drawer: CustomDrawer(
-          onItemTap: (page) {
-            setState(() {
-              selectedPage = page;
-            });
-            Navigator.of(context).pop();
-          },
-          nomeAluno: widget.nomeAluno,
-          idMatricula: widget.idMatricula),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : hasError
-              ? const Center(child: Text('Erro ao carregar documentos.'))
-              : ListView.builder(
-                  itemCount: documents.length,
-                  itemBuilder: (context, index) {
-                    final document = documents[index];
-                    return ListTile(
-                      title: Text(document.title),
-                      subtitle: const Text('Clique para visualizar ou baixar'),
-                      trailing: !kIsWeb
-                          ? IconButton(
-                              icon: const Icon(FontAwesomeIcons.filePdf),
-                              onPressed: () {
-                                downloadPdf(
-                                    document.link, document.title + '.pdf');
-                              },
-                            )
-                          : null, // Ícone aparece somente em plataformas móveis
-                      onTap: () {
-                        if (kIsWeb) {
-                          // Se estiver na web, chama o downloadPdf diretamente
-                          downloadPdf(document.link, document.title + '.pdf');
-                        } else {
-                          // Em plataformas móveis, navega para a visualização do PDF
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  PdfViewerPage(pdfUrl: document.link, document: document,),
+      backgroundColor: const Color(0xFF094366),
+        appBar: CustomAppbar(title: selectedPage),
+        drawer: CustomDrawer(
+            onItemTap: (page) {
+              setState(() {
+                selectedPage = page;
+              });
+              Navigator.of(context).pop();
+            },
+            nomeAluno: widget.nomeAluno,
+            idMatricula: widget.idMatricula),
+        body: isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : hasError
+                ? const Center(child: Text('Erro ao carregar documentos.'))
+                : ListView(
+                    padding: const EdgeInsets.all(16.0),
+                    children: [
+                      Container(
+                        color: Colors.white,
+                        child: Column(
+                          children: [
+                            const SizedBox(
+                              height: 20,
                             ),
-                          );
-                        }
-                      },
-                    );
-                  },
-                ),
-    );
+                            Text(
+                              'Documentos',
+                              style: TextStyle(
+                                  color: Colors.blue,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            Divider(
+                              height: 3,
+                              thickness: 2,
+                              color: Colors.black,
+                            ),
+                            Container(
+                              child: ListView.builder(
+                                shrinkWrap: true,
+                                physics: NeverScrollableScrollPhysics(),
+                                  itemCount: documents.length,
+                                  itemBuilder: (context, index) {
+                                    final documentos = documents[index];
+                                    return Container(
+                                        child: ListTile(
+                                      title: Text(documentos.title),
+                                      subtitle: const Text(
+                                          'Clique para visualizar'),
+                                      trailing: !kIsWeb
+                                          ? IconButton(
+                                              icon: const Icon(
+                                                  FontAwesomeIcons.filePdf),
+                                              onPressed: () {
+                                                downloadPdf(documentos.link,
+                                                    documentos.title + '.pdf');
+                                              },
+                                            )
+                                          : null, // Ícone aparece somente em plataformas móveis
+                                      onTap: () {
+                                        if (kIsWeb) {
+                                          // Se estiver na web, chama o downloadPdf diretamente
+                                          downloadPdf(documentos.link,
+                                              documentos.title + '.pdf');
+                                        } else {
+                                          // Em plataformas móveis, navega para a visualização do PDF
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  PdfViewerPage(
+                                                pdfUrl: documentos.link,
+                                                document: documentos,
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      },
+                                    ));
+                                  }),
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
+                  ));
   }
 }
 
 class PdfViewerPage extends StatelessWidget {
   final String pdfUrl;
   final Documents document;
-  const PdfViewerPage({Key? key, required this.pdfUrl, required this.document}) : super(key: key);
+  const PdfViewerPage({Key? key, required this.pdfUrl, required this.document})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -180,7 +216,7 @@ class PdfViewerPage extends StatelessWidget {
     );
   }
 
-    void downloadPdf(String url, String fileName, BuildContext context) {
+  void downloadPdf(String url, String fileName, BuildContext context) {
     downloader.downloadPdf(url, fileName, context);
   }
 }

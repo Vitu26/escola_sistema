@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:app/model/exam_quetions_options_model.dart';
 import 'package:app/utils/cache_manager.dart';
-import 'package:app/widgets/drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 

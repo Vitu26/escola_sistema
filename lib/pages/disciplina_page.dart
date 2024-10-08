@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:app/model/atividade_disciplina_model.dart';
 import 'package:app/model/disciplinas_model.dart';
 import 'package:app/pages/atividades/atividade_disciplina_page.dart';
 import 'package:app/pages/atividades/aulas_disciplinas_page.dart';

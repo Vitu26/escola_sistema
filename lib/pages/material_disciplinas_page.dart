@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 // import 'package:path_provider/path_provider.dart';
 // import 'package:open_file/open_file.dart';
-import 'package:dio/dio.dart';
+
 
 class MateriaisPage extends StatefulWidget {
   final int disciplineId;
 
-  const MateriaisPage({required this.disciplineId, Key? key}) : super(key: key);
+  const MateriaisPage({required this.disciplineId, super.key});
 
   @override
   _MateriaisPageState createState() => _MateriaisPageState();
@@ -87,20 +87,20 @@ class _MateriaisPageState extends State<MateriaisPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Materiais da Disciplina'),
+        title: const Text('Materiais da Disciplina'),
       ),
       body: isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : hasError
-              ? Center(child: Text('Erro ao carregar materiais.'))
+              ? const Center(child: Text('Erro ao carregar materiais.'))
               : ListView.builder(
                   itemCount: materiais.length,
                   itemBuilder: (context, index) {
                     final material = materiais[index];
                     return ListTile(
                       title: Text(material.titulo),
-                      subtitle: Text('Clique para baixar'),
-                      trailing: Icon(Icons.download),
+                      subtitle: const Text('Clique para baixar'),
+                      trailing: const Icon(Icons.download),
                       onTap: () {
                         // downloadAndOpenFile(
                         //     material.link, material.titulo + '.pdf');

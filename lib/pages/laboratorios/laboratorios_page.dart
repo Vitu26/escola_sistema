@@ -1,7 +1,8 @@
 import 'dart:convert';
 import 'package:app/utils/cache_manager.dart';
+import 'package:app/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:app/utils/api_service.dart'; // Certifique-se de importar o ApiService correto
+import 'package:app/utils/api_service.dart';
 import 'package:app/model/laboratorios_model.dart';
 import 'package:app/widgets/drawer.dart';
 import 'package:http/http.dart' as http;
@@ -12,11 +13,11 @@ class LaboratoriosPage extends StatefulWidget {
   final String idMatricula;
 
   const LaboratoriosPage({
-    Key? key,
+    super.key,
     required this.nomeAluno,
     this.fotoAluno,
     required this.idMatricula,
-  }) : super(key: key);
+  });
 
   @override
   State<LaboratoriosPage> createState() => _LaboratoriosPageState();
@@ -96,7 +97,6 @@ class _LaboratoriosPageState extends State<LaboratoriosPage> {
     // Obtém o token de autenticação
     String? token = await apiService.getToken();
     if (token == null) {
-      print('Token ausente ou inválido.');
       setState(() {
         hasError = true;
         isLoading = false;
@@ -115,8 +115,6 @@ class _LaboratoriosPageState extends State<LaboratoriosPage> {
         body: {}, // Corpo vazio, como mostrado no Postman
       );
 
-      print('Resposta da API: ${response.body}');
-      print('Status Code: ${response.statusCode}');
 
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
@@ -132,14 +130,12 @@ class _LaboratoriosPageState extends State<LaboratoriosPage> {
         // Salva no cache
         await cacheManager.saveToCache('laboratorios_cache', response.body);
       } else {
-        print('Erro na resposta da API: ${response.body}');
         setState(() {
           hasError = true;
           isLoading = false;
         });
       }
     } catch (e) {
-      print('Erro ao buscar laboratórios: $e');
       setState(() {
         hasError = true;
         isLoading = false;
@@ -150,9 +146,8 @@ class _LaboratoriosPageState extends State<LaboratoriosPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Laboratórios Virtuais'),
-      ),
+      backgroundColor: const Color(0xFF094366),
+      appBar: CustomAppbar(title: selectedPage),
       drawer: CustomDrawer(
         onItemTap: (page) {
           setState(() {
@@ -164,22 +159,47 @@ class _LaboratoriosPageState extends State<LaboratoriosPage> {
         idMatricula: widget.idMatricula,
       ),
       body: isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : hasError
-              ? Center(child: Text('Erro ao carregar laboratórios.'))
-              : ListView.builder(
-                  itemCount: laboratorio.length,
-                  itemBuilder: (context, index) {
-                    final laboratorios = laboratorio[index];
-                    return ListTile(
-                      title: Text(laboratorios.laboratorio),
-                      onTap: () {
-                        // Ação ao clicar em um laboratório
-                        print(
-                            'Laboratório selecionado: ${laboratorios.laboratorio}');
-                      },
-                    );
-                  },
+              ? const Center(child: Text('Erro ao carregar laboratórios.'))
+              : ListView(
+                  padding: const EdgeInsets.all(16),
+                  children: [
+                    Container(
+                      color: Colors.white,
+                      child: Column(
+                        children: [
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          Text(
+                            selectedPage,
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.blue,
+                                fontSize: 18),
+                          ),
+                          const SizedBox(height: 10,),
+                          const Divider(
+                            height: 1,
+                            thickness: 2,
+                            color: Colors.black,
+                          ),
+                          ListView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: laboratorio.length,
+                              itemBuilder: (context, index) {
+                                final laboratorios = laboratorio[index];
+                                return ListTile(
+                                  title: Text(laboratorios.laboratorio),
+                                  onTap: () {},
+                                );
+                              })
+                        ],
+                      ),
+                    )
+                  ],
                 ),
     );
   }

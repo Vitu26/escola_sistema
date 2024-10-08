@@ -2,10 +2,9 @@ import 'dart:convert';
 
 import 'package:app/model/biblioteca_model.dart';
 import 'package:app/utils/api_service.dart';
-import 'package:app/utils/cache_manager.dart';
+import 'package:app/widgets/custom_app_bar.dart';
 import 'package:app/widgets/drawer.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 
 class BibliotecaPage extends StatefulWidget {
   final String nomeAluno;
@@ -81,7 +80,10 @@ class _BibliotecaPageState extends State<BibliotecaPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(),
+        backgroundColor: const Color(0xFF094366),
+        appBar: CustomAppbar(
+          title: selectedPage,
+        ),
         drawer: CustomDrawer(
             onItemTap: onItemTap,
             nomeAluno: widget.nomeAluno,
@@ -90,18 +92,44 @@ class _BibliotecaPageState extends State<BibliotecaPage> {
             ? Center(
                 child: CircularProgressIndicator(),
               )
-            : ListView.builder(
-                itemCount: bibliotecas.length,
-                itemBuilder: (context, index) {
-                  final biblioteca = bibliotecas[index];
-                  return ListTile(
-                    title: Text(biblioteca.biblioteca),
-                    onTap: () {
-                      print('Biblioteca selecionada: ${biblioteca.biblioteca}');
-                    },
-                  );
-                }));
+            : ListView(
+                padding: const EdgeInsets.all(16.0),
+                children: [
+                  Container(
+                    color: Colors.white,
+                    child: Column(children: [
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      Text(
+                        'Bibliotecas',
+                        style: TextStyle(
+                            color: Colors.blue,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      Divider(
+                        height: 3,
+                        thickness: 2,
+                        color: Colors.black,
+                      ),
+                      ListView.builder(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          itemCount: bibliotecas.length,
+                          itemBuilder: (context, index) {
+                            final biblioteca = bibliotecas[index];
+                            return ListTile(
+                              title: Text(biblioteca.biblioteca),
+                              onTap: () {
+                                print(
+                                    'Biblioteca selecionada: ${biblioteca.biblioteca}');
+                              },
+                            );
+                          })
+                    ]),
+                  )
+                ],
+              ));
   }
 }
-
-

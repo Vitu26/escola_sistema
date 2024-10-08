@@ -185,6 +185,9 @@ class _FinanceiroPageState extends State<FinanceiroPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isMobile =
+        MediaQuery.of(context).size.width < 600; // Responsividade
+
     return Scaffold(
       backgroundColor: const Color(0xFF094366),
       appBar: CustomAppbar(
@@ -192,9 +195,10 @@ class _FinanceiroPageState extends State<FinanceiroPage> {
         elevation: 16.0,
       ),
       drawer: CustomDrawer(
-          onItemTap: onItemTap,
-          nomeAluno: widget.nomeAluno,
-          idMatricula: widget.idMatricula),
+        onItemTap: onItemTap,
+        nomeAluno: widget.nomeAluno,
+        idMatricula: widget.idMatricula,
+      ),
       body: isLoading
           ? const Center(
               child: CircularProgressIndicator(),
@@ -206,7 +210,6 @@ class _FinanceiroPageState extends State<FinanceiroPage> {
               : ListView(
                   padding: const EdgeInsets.all(16),
                   children: [
-                    // Container de aviso para negociação de dívidas
                     Container(
                       padding: const EdgeInsets.all(16),
                       color: Colors.yellow[100],
@@ -217,13 +220,13 @@ class _FinanceiroPageState extends State<FinanceiroPage> {
                             children: [
                               TextSpan(
                                   text:
-                                      'Temos condições especiais para você negociar a sua dívida ',),
+                                      'Temos condições especiais para você negociar a sua dívida '),
                               TextSpan(
                                 text: 'Clique aqui',
                                 style: TextStyle(
-                                    color: Colors.blue,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                  color: Colors.blue,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ],
                           ),
@@ -231,13 +234,11 @@ class _FinanceiroPageState extends State<FinanceiroPage> {
                       ),
                     ),
                     const SizedBox(height: 16),
-
                     Container(
                       color: Colors.white,
                       child: Column(
                         children: [
                           const SizedBox(height: 16),
-                          // Título das faturas
                           Text(
                             'Minhas faturas',
                             style: TextStyle(
@@ -245,34 +246,53 @@ class _FinanceiroPageState extends State<FinanceiroPage> {
                               fontSize: 16,
                             ),
                           ),
-
                           const SizedBox(height: 16),
 
-                          // Tabela de faturas
-                          SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: DataTable(
-                              columns: const [
-                                DataColumn(label: Text('Fatura #')),
-                                DataColumn(label: Text('Referência da fatura')),
-                                DataColumn(label: Text('Data de vencimento')),
-                                DataColumn(label: Text('Ação')),
-                              ],
-                              rows: parcelas.map((parcela) {
-                                return DataRow(
-                                  cells: [
-                                    DataCell(Text('#')),
-                                    DataCell(Text(parcela.referencia ??
-                                        'Sem referência')),
-                                    DataCell(Text(
-                                        parcela.dataVencimento ?? 'Sem data')),
-                                    // Botão de Ação "Pagar"
-                                    DataCell(
+                          // Listagem adaptada para mobile
+                          if (isMobile)
+                            Column(
+                              children: parcelas.map((parcela) {
+                                // Determinar a cor com base no status
+                                Color itemColor;
+                                if (parcela.status == 'pago') {
+                                  itemColor = Colors.green[100]!;
+                                } else if (parcela.isVencida) {
+                                  itemColor = Colors.red[100]!;
+                                } else {
+                                  itemColor =
+                                      Colors.white; // Status em aberto ou outro
+                                }
+
+                                return Container(
+                                  color: itemColor,
+                                  padding: const EdgeInsets.all(
+                                      16), // Padding interno
+                                  child: Row(
+                                    children: [
+                                      // Coluna expandida com informações da fatura
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                                'Referência: ${parcela.referencia}',
+                                                style: const TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold)),
+                                            Text(
+                                                'Vencimento: ${parcela.dataVencimento}'),
+                                          ],
+                                        ),
+                                      ),
+                                      // Botão ou texto de status
                                       parcela.status == 'pago'
                                           ? Text(
                                               'Pago',
                                               style: TextStyle(
-                                                  color: Colors.green),
+                                                color: Colors.green[800],
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                             )
                                           : ElevatedButton(
                                               onPressed: () {
@@ -281,33 +301,65 @@ class _FinanceiroPageState extends State<FinanceiroPage> {
                                               },
                                               child: Text('Pagar'),
                                             ),
-                                    ),
-                                  ],
-                                  color:
-                                      MaterialStateProperty.resolveWith<Color?>(
-                                    (Set<MaterialState> states) {
-                                      if(parcela.status == 'pago'){
-                                        return Colors.green[100];
-                                      }else
-                                      if (parcela.isVencida) {
-                                        return Colors.red[100];
-                                      }else{
-                                        return null;
-                                      }
-                                    },
+                                    ],
                                   ),
                                 );
                               }).toList(),
+                            )
+                          else
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: DataTable(
+                                columns: const [
+                                  DataColumn(label: Text('Fatura #')),
+                                  DataColumn(
+                                      label: Text('Referência da fatura')),
+                                  DataColumn(label: Text('Data de vencimento')),
+                                  DataColumn(label: Text('Ação')),
+                                ],
+                                rows: parcelas.map((parcela) {
+                                  return DataRow(
+                                    cells: [
+                                      DataCell(Text('#')),
+                                      DataCell(Text(parcela.referencia)),
+                                      DataCell(Text(parcela.dataVencimento)),
+                                      DataCell(
+                                        parcela.status == 'pago'
+                                            ? Text(
+                                                'Pago',
+                                                style: TextStyle(
+                                                    color: Colors.green),
+                                              )
+                                            : ElevatedButton(
+                                                onPressed: () {
+                                                  emitirFatura(
+                                                      parcela.transactionId);
+                                                },
+                                                child: Text('Pagar'),
+                                              ),
+                                      ),
+                                    ],
+                                    color: MaterialStateProperty.resolveWith<
+                                        Color?>(
+                                      (Set<MaterialState> states) {
+                                        if (parcela.status == 'pago') {
+                                          return Colors.green[100];
+                                        } else if (parcela.isVencida) {
+                                          return Colors.red[100];
+                                        } else {
+                                          return null;
+                                        }
+                                      },
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
                             ),
-                          ),
                           const SizedBox(height: 16),
                         ],
                       ),
                     ),
-
                     const SizedBox(height: 16),
-
-                    // Informações importantes
                     Container(
                       padding: const EdgeInsets.all(16),
                       color: Colors.blue[100],

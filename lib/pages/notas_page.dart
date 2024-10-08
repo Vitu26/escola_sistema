@@ -13,11 +13,11 @@ class NotasPage extends StatefulWidget {
   final String? fotoAluno;
   final String idMatricula;
   const NotasPage({
-    Key? key,
+    super.key,
     required this.nomeAluno,
     this.fotoAluno,
     required this.idMatricula,
-  }) : super(key: key);
+  });
 
   @override
   State<NotasPage> createState() => _NotasPageState();
@@ -85,12 +85,12 @@ class _NotasPageState extends State<NotasPage> {
           nomeAluno: widget.nomeAluno,
           idMatricula: widget.idMatricula),
       body: isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : hasError
-              ? Center(child: Text('Erro ao carregar notas.'))
+              ? const Center(child: Text('Erro ao carregar notas.'))
               : Container(
-                padding: EdgeInsets.symmetric(horizontal: 14),
-                child: ListView(
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  child: ListView(
                     children: notasPorPeriodo.entries.map((entry) {
                       final periodo = entry.key;
                       final notas = entry.value as List<Nota>;
@@ -114,18 +114,33 @@ class _NotasPageState extends State<NotasPage> {
                               elevation: 2,
                               margin: const EdgeInsets.symmetric(vertical: 5.0),
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 20),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 20),
                                 child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
+                                    const SizedBox(
+                                      height: 15,
+                                    ),
                                     Text(
                                       nota.disciplina,
                                       style: const TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
                                       ),
+                                      textAlign: TextAlign.center,
                                     ),
-                                    const SizedBox(height: 10,),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    const Divider(
+                                      height: 3,
+                                      thickness: 2,
+                                      color: Colors.black,
+                                    ),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
                                     Row(
                                       children: [
                                         const SizedBox(height: 8),
@@ -135,14 +150,18 @@ class _NotasPageState extends State<NotasPage> {
                                             fontSize: 14,
                                           ),
                                         ),
-                                        const SizedBox(width: 20,),
+                                        const SizedBox(
+                                          width: 20,
+                                        ),
                                         Text(
                                           'Nota: ${nota.nota ?? 'sem nota'}',
                                           style: const TextStyle(
                                             fontSize: 14,
                                           ),
                                         ),
-                                        const SizedBox(width: 20,),
+                                        const SizedBox(
+                                          width: 20,
+                                        ),
                                         Text(
                                           'Nota: ${nota.nota ?? 'sem nota'}',
                                           style: const TextStyle(
@@ -151,7 +170,9 @@ class _NotasPageState extends State<NotasPage> {
                                         ),
                                       ],
                                     ),
-                                    const SizedBox(height: 10,),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
                                     Row(
                                       children: [
                                         const SizedBox(height: 8),
@@ -161,14 +182,18 @@ class _NotasPageState extends State<NotasPage> {
                                             fontSize: 14,
                                           ),
                                         ),
-                                        const SizedBox(width: 20,),
+                                        const SizedBox(
+                                          width: 20,
+                                        ),
                                         Text(
                                           'Nota: ${nota.nota ?? 'sem nota'}',
                                           style: const TextStyle(
                                             fontSize: 14,
                                           ),
                                         ),
-                                        const SizedBox(width: 20,),
+                                        const SizedBox(
+                                          width: 20,
+                                        ),
                                         Text(
                                           'Nota: ${nota.nota ?? 'sem nota'}',
                                           style: const TextStyle(
@@ -177,7 +202,9 @@ class _NotasPageState extends State<NotasPage> {
                                         ),
                                       ],
                                     ),
-                                    const SizedBox(height: 10,),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.end,
                                       children: [
@@ -189,17 +216,20 @@ class _NotasPageState extends State<NotasPage> {
                                           ),
                                         ),
                                       ],
-                                    )
+                                    ),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
                                   ],
                                 ),
                               ),
                             );
-                          }).toList(),
+                          })
                         ],
                       );
                     }).toList(),
                   ),
-              ),
+                ),
     );
   }
 }

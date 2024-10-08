@@ -1,8 +1,8 @@
 import 'dart:convert';
 
-import 'package:app/model/detalhes_solicitacoes_model.dart';
 import 'package:app/model/solicitacoes_model.dart';
 import 'package:app/pages/solicitacoes/detalhes_solicitacoes_page.dart';
+import 'package:app/widgets/custom_app_bar.dart';
 import 'package:app/widgets/drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -78,25 +78,69 @@ class _SolicitacoesPageState extends State<SolicitacoesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
-      drawer: CustomDrawer(
-          onItemTap: onItemTap,
-          nomeAluno: widget.nomeAluno,
-          idMatricula: widget.idMatricula),
-      body: isLoading ?
-        Center(child: CircularProgressIndicator(),)
-        : ListView.builder(
-          itemCount: solicitacoes.length,
-          itemBuilder: (context, index){
-            final solicitacao = solicitacoes[index];
-            return ListTile(
-              title: Text(solicitacao.titulo),
-              subtitle: Text(solicitacao.status),
-              onTap: (){
-                Navigator.of(context).push(MaterialPageRoute(builder: (context) => DetalhesSolicitacoesPage(solicitacaoId: solicitacao.id,)));
-              },
-            );
-          })
-    );
+        backgroundColor: const Color(0xFF094366),
+        appBar: CustomAppbar(title: selectedPage),
+        drawer: CustomDrawer(
+            onItemTap: onItemTap,
+            nomeAluno: widget.nomeAluno,
+            idMatricula: widget.idMatricula),
+        body: isLoading
+            ? const Center(
+                child: CircularProgressIndicator(),
+              )
+            : ListView(
+                padding: const EdgeInsets.all(16),
+                children: [
+                  Container(
+                    color: Colors.white,
+                    child: Column(
+                      children: [
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        const Text(
+                          'Solicitações',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: Colors.black),
+                          textAlign: TextAlign.center,
+                        ),
+                        const Divider(
+                          height: 3,
+                          thickness: 2,
+                          color: Colors.black,
+                        ),
+                        Container(
+                          color: Colors.white,
+                          child: ListView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: solicitacoes.length,
+                              itemBuilder: (context, index) {
+                                final solicitacao = solicitacoes[index];
+                                return Container(
+                                  color: Colors.white,
+                                  child: ListTile(
+                                    title: Text(solicitacao.titulo),
+                                    subtitle: Text(solicitacao.status),
+                                    onTap: () {
+                                      Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  DetalhesSolicitacoesPage(
+                                                    solicitacaoId:
+                                                        solicitacao.id,
+                                                  )));
+                                    },
+                                  ),
+                                );
+                              }),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ));
   }
 }
